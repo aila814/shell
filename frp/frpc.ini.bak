@@ -1,0 +1,10 @@
+[common]
+server_addr = lihuazou.top
+server_port = 7000
+token=aila
+[shsh]
+type = tcp
+remote_port = 6000
+plugin = static_file
+# 要对外暴露的文件目录
+plugin_local_path = /sdcard
