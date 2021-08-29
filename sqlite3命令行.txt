@@ -1,0 +1,14 @@
+
+man 数据库名
+files 表名
+查询全部
+sqlite3 数据库 "SELECT *,rowid NAVICAT_ROWID FROM main.files"
+
+查询字段pic_info空的且名称包含.jpg
+SELECT *,rowid NAVICAT_ROWID FROM main.files WHERE pic_info = '' AND name LIKE '%.jpg%'
+
+更新数据id 6的pic_info数据为0
+UPDATE main.files SET pic_info = '0' WHERE rowid = 6
+
+删除id 6 
+DELETE FROM main.files WHERE rowid = 6
