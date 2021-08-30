@@ -109,6 +109,17 @@ if [[ -n $(systemctl status frps | grep "Active" | grep "running") ]]; then
 	echo -e "$red[INFO]$Font 未运行"
 fi
 }
+add_port(){
+    if [[ $(cat /etc/os-release | grep -w ID | sed 's/ID=//' | sed 's/\"//g') == "centos" ]]; then
+        firewall-cmd --zone=public --add-port=$1/tcp --permanent
+		firewall-cmd --zone=public --add-port=$1/udp --permanent
+		firewall-cmd --reload
+		else
+		ufw allow $1/tcp
+	    ufw allow $1/udp
+    fi
+    
+}
 Detection_port(){
 kcp_port=$(awk -F'=' '/kcp_bind_port/{print $2}' /etc/frps/frps.ini)
 udp_port=$(awk -F'=' '/bind_udp_port/{print $2}' /etc/frps/frps.ini)
@@ -171,9 +182,8 @@ if [[ "$x" == "1" ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
 	    else
-	    if [[ -n $(echo $tmp | sed -n '/^[0-9][0-9]*$/p') ]];then
 	    sed -i '/^bind_port/s/.*/bind_port='$tmp'/g' /etc/frps/frps.ini
-	    fi
+        add_port $tmp
 	fi
 	
 	
@@ -184,9 +194,8 @@ if [[ "$x" == "2" ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
 	    else
-	    if [[ -n $(echo $tmp | sed -n '/^[0-9][0-9]*$/p') ]];then
 	    sed -i '/vhost_http_port/s/.*/vhost_http_port='$tmp'/g' /etc/frps/frps.ini
-	    fi
+        add_port $tmp
 	fi
 	
 fi
@@ -196,9 +205,8 @@ if [[ "$x" == "3" ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
 	    else
-        if [[ -n $(echo $tmp | sed -n '/^[0-9][0-9]*$/p') ]];then
 	    sed -i '/vhost_https_port/s/.*/vhost_https_port='$tmp'/g' /etc/frps/frps.ini
-	    fi
+	    add_port $tmp
 	fi
 	
 fi
@@ -220,9 +228,8 @@ if [[ "$x" == "5" ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
 	    else
-	    if [[ -n $(echo $tmp | sed -n '/^[0-9][0-9]*$/p') ]]; then
 	    sed -i '/kcp_bind_port/s/.*/kcp_bind_port='$tmp'/g' /etc/frps/frps.ini
-	    fi
+	    add_port $tmp
 	fi
 	
 fi
@@ -232,9 +239,8 @@ if [[ "$x" == "6" ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
 	    else
-	    if [[ -n $(echo $tmp | sed -n '/^[0-9][0-9]*$/p') ]]; then
 	    sed -i '/bind_udp_port/s/.*/bind_udp_port='$tmp'/g' /etc/frps/frps.ini
-	    fi
+	    add_port $tmp
 	fi
 	
 fi
