@@ -212,14 +212,10 @@ if [[ "$x" == "3" ]]; then
 fi
 if [[ "$x" == "4" ]]; then
 	read -p "输入TOKEN: " tmp
-	if [[ -n $(lsof -i:$tmp) ]]; then
-	    echo -e "$red[INFO]$Font 端口已使用"
-	    frp_edit
-	    else
+
 	   	if [[ -n  $tmp ]]; then
 	    sed -i '/token/s/.*/token='$tmp'/g' /etc/frps/frps.ini
 	    fi
-	fi
 
 fi
 if [[ "$x" == "5" ]]; then
