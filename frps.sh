@@ -34,7 +34,7 @@ vhost_http_port=80
 # https端口
 vhost_https_port=443
 # 连接密码
-token=aila
+token=123456
 # web面板端口
 # dashboard_port=7500
 # web面板账号
