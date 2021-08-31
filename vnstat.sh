@@ -25,5 +25,6 @@ RestartSec=3s
 
 [Install]
 WantedBy=multi-user.target" > /usr/lib/systemd/system/vnstat.service
+systemctl daemon-reload
 systemctl start vnstat
 systemctl enable vnstat
