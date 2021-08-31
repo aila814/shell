@@ -19,7 +19,6 @@ After=network.target
 [Service]
 User=root
 ExecStart=/etc/vnstat/sbin/vnstatd -n --config /etc/vnstat/etc/vnstat.conf
-ExecReload=/bin/kill -HUP "'$MAINPID'"
 Restart=always
 RestartSec=3s
 
