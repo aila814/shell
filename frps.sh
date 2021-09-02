@@ -140,28 +140,7 @@ add_port(){
     fi
     
 }
-Detection_port(){
-kcp_port=$(awk -F'=' '/kcp_bind_port/{print $2}' /etc/frps/frps.ini)
-udp_port=$(awk -F'=' '/bind_udp_port/{print $2}' /etc/frps/frps.ini)
-http=$(awk -F'=' '/vhost_http_port/{print $2}' /etc/frps/frps.ini)
-https=$(awk -F'=' '/vhost_https_port/{print $2}' /etc/frps/frps.ini)
-port=$(awk -F'=' '/^bind_port/{print $2}' /etc/frps/frps.ini)
-token=$(awk -F'=' '/token/{print $2}' /etc/frps/frps.ini)
-if [[ -n $(lsof -i:$kcp_port) ]]; then
-	echo -e "$red[INFO]$Font KCP端口已使用"
-elif [[ -n $(lsof -i:$udp_port) ]]; then
-	echo -e "$red[INFO]$Font UDP端口已使用"
-elif [[ -n $(lsof -i:$http) ]]; then
-	echo -e "$red[INFO]$Font HTTP端口已使用"
-elif [[ -n $(lsof -i:$https) ]]; then
-	echo -e "$red[INFO]$Font HTTPS端口已使用"
-elif [[ -n $(lsof -i:$port) ]]; then
-	echo -e "$red[INFO]$Font 连接端口已使用"
-else
-    start
-fi
 
-}
 
 # 查看配置信息
 frps_1(){
@@ -289,7 +268,7 @@ if [[ "$x" == "3" ]]; then
 	if [[ ! -d /etc/frps ]]; then
 		echo -e "$red[INFO]$Font 未安装"
 	else
-		Detection_port
+		start
 	fi
 
 fi
