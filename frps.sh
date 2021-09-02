@@ -34,7 +34,7 @@ install(){
     [[ -z ${frps_update_version} ]] && exit 0
     url="https://github.com/fatedier/frp/releases/download/v${frps_version}/frp_${frps_version}_${Arch}.tar.gz"
     
-	[[ ! -d "mkdir /etc/frps" ]] && mkdir /etc/frps
+	[[ ! -d "/etc/frps" ]] && mkdir /etc/frps
 	cd /etc/frps
 	echo -e "$green[INFO]$Font 开始下载:$frps_version"
 	wget -q -O "${frps_version}.tar.gz" $url
