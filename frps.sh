@@ -5,24 +5,44 @@ yellow="\033[33m\033[01m"
 red="\033[31m\033[01m"
 Font="\033[0m"
 
-Arch="amd64"
-frps_version="0.37.1"
-url="https://github.com/fatedier/frp/releases/download/v${frps_version}/frp_${frps_version}_linux_${Arch}.tar.gz"
 #安装frps
 install(){
-    if [[ -z $(command -v lsof) ]]; then
-    echo "开始安装lsof"
-    yum install -y lsof || apt install -y lsof 
+
+    if [[ $(cat /etc/os-release | grep -w ID | sed 's/ID=//' | sed 's/\"//g') == "centos" ]]; then
+        if [[ -z $(command -v lsof) ]]; then
+        yum install -y lsof
+        fi
+    else
+        if [[ -z $(command -v lsof) ]]; then
+        apt install -y lsof
+        fi
+        if [[ -z $(command -v ufw) ]]; then
+        apt-get update -y && apt-get install ufw -y
+        ufw enable
+        fi
     fi
+    
+    # 获取最新版本
+    frps_url=$(curl -s https://github.com/fatedier/frp/releases.atom | grep '<link rel="alternate" type="text\/html" href=' | sed 's/^.*href="//g' | sed 's/"\/>//g' | head -1)
+    # 最新版本
+    frps_update_version=${frps_url##*/v}
+    # 架构
+    Arch="linux_amd64"
+    # 版本
+    frps_version="${frps_update_version}"
+    # 
+    [[ -z ${frps_update_version} ]] && exit 0
+    url="https://github.com/fatedier/frp/releases/download/v${frps_version}/frp_${frps_version}_${Arch}.tar.gz"
+    
 	[[ ! -d "mkdir /etc/frps" ]] && mkdir /etc/frps
 	cd /etc/frps
-	wget -O "${frps_version}.tar.gz" $url
+	echo -e "$green[INFO]$Font 开始下载:$frps_version"
+	wget -q -O "${frps_version}.tar.gz" $url
 	tar zxf "${frps_version}.tar.gz"
-	cp ./frp_${frps_version}_linux_amd64/frps ./
+	cp -f ./frp_${frps_version}_linux_amd64/frps ./
 	rm -rf "frp_${frps_version}_linux_amd64" "${frps_version}.tar.gz"
 	chmod +x /etc/frps/frps
-    
-	echo -e "[common]
+    [[ ! -f "/etc/frps/frps.ini" ]] && 	echo -e "[common]
 # 连接端口
 bind_port=7000
 # kcp连接端口
@@ -47,7 +67,7 @@ token=123456
 # custom_404_page=./404.html" > /etc/frps/frps.ini
 
 	
-	echo -e "[Unit]
+echo -e "[Unit]
 Description=frps
 After=network.target
 
@@ -59,7 +79,7 @@ ExecStart=/etc/frps/frps -c /etc/frps/frps.ini
 
 [Install]
 WantedBy=multi-user.target" > /lib/systemd/system/frps.service
-
+systemctl daemon-reload
 systemctl enable frps
 }
 #卸载
