@@ -31,7 +31,7 @@ install(){
     # 版本
     frps_version="${frps_update_version}"
     # 获取新版本失败 退出
-    [[ -z ${frps_update_version} ]] && exit 0
+    [[ -z ${frps_update_version} ]] && echo "获取frp版本失败,退出" && exit 0
     url="https://github.com/fatedier/frp/releases/download/v${frps_version}/frp_${frps_version}_${Arch}.tar.gz"
     
 	[[ ! -d "/etc/frps" ]] && mkdir /etc/frps
