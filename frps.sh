@@ -129,7 +129,7 @@ if [[ -n $(systemctl status frps | grep "Active" | grep "running") ]]; then
 	echo -e "$red[INFO]$Font 未运行"
 fi
 }
-# 开发端口
+# 开放端口
 add_port(){
     if [[ $(cat /etc/os-release | grep -w ID | sed 's/ID=//' | sed 's/\"//g') == "centos" ]]; then
     if [[ -z $(firewall-cmd --zone=public --list-ports | grep $1) ]]; then
