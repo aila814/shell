@@ -129,14 +129,20 @@ if [[ -n $(systemctl status frps | grep "Active" | grep "running") ]]; then
 	echo -e "$red[INFO]$Font 未运行"
 fi
 }
+# 开发端口
 add_port(){
     if [[ $(cat /etc/os-release | grep -w ID | sed 's/ID=//' | sed 's/\"//g') == "centos" ]]; then
-        firewall-cmd --zone=public --add-port=$1/tcp --permanent
+    if [[ -z $(firewall-cmd --zone=public --list-ports | grep $1) ]]; then
+    firewall-cmd --zone=public --add-port=$1/tcp --permanent
 		firewall-cmd --zone=public --add-port=$1/udp --permanent
 		firewall-cmd --reload
-		else
+   fi
+        else
+        if [[ -z $(ufw status | grep $1) ]]; then
 		ufw allow $1/tcp
 	    ufw allow $1/udp
+	
+	    fi
     fi
     
 }
