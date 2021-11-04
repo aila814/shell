@@ -23,24 +23,24 @@ install(){
     fi
     
     # 获取最新版本
-    frps_url=$(curl -s https://github.com/fatedier/frp/releases.atom | grep '<link rel="alternate" type="text\/html" href=' | sed 's/^.*href="//g' | sed 's/"\/>//g' | head -1)
-    # 最新版本
-    frps_update_version=${frps_url##*/v}
-    # 架构
-    Arch="linux_amd64"
-    # 版本
-    frps_version="${frps_update_version}"
+    version=$(curl -s https://api.github.com/repos/fatedier/frp/releases/latest | grep tag_name | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g;s/v//g')
+
+    Arch="amd64"
     # 获取新版本失败 退出
-    [[ -z ${frps_update_version} ]] && echo "获取frp版本失败,退出" && exit 0
-    url="https://github.com/fatedier/frp/releases/download/v${frps_version}/frp_${frps_version}_${Arch}.tar.gz"
-    
+    [[ -z ${version} ]] && exit 0
+    # 下载地址
+    url=$(curl -s https://api.github.com/repos/fatedier/frp/releases/latest | grep "browser_download_url" | sed 's/browser_download_url//g;s/\"//g;s/: //g;s/ //g' | grep linux_$Arch | head -1)
+   
 	[[ ! -d "/etc/frps" ]] && mkdir /etc/frps
-	cd /etc/frps
-	echo -e "$green[INFO]$Font 开始下载:$frps_version"
-	wget -q -O "${frps_version}.tar.gz" $url
-	tar zxf "${frps_version}.tar.gz"
-	cp -f ./frp_${frps_version}_linux_amd64/frps ./
-	rm -rf "frp_${frps_version}_linux_amd64" "${frps_version}.tar.gz"
+	# cd /etc/frps
+	echo -e "$green[INFO]$Font 开始下载:$version"
+	# 下载
+    wget -q -O "frp_${version}_linux_${Arch}.tar.gz" $url
+	#解压
+    tar zxf "frp_${version}_linux_${Arch}.tar.gz" 
+    # 移动frps
+	mv frp_${version}_linux_${Arch}/frps /etc/frps/
+    rm -rf frp_${version}_linux_${Arch}*
 	chmod +x /etc/frps/frps
     [[ ! -f "/etc/frps/frps.ini" ]] && 	echo -e "[common]
 # 连接端口
@@ -188,7 +188,7 @@ if [[ "$x" == "1" ]]; then
 	
 fi
 if [[ "$x" == "2" ]]; then
-	read -p "HTTP端口: " tmp
+	read -p "HTTSP端口: " tmp
 	if [[ -n $(lsof -i:$tmp) ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
