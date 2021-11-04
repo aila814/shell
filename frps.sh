@@ -188,7 +188,7 @@ if [[ "$x" == "1" ]]; then
 	
 fi
 if [[ "$x" == "2" ]]; then
-	read -p "HTTSP端口: " tmp
+	read -p "HTTP端口: " tmp
 	if [[ -n $(lsof -i:$tmp) ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
