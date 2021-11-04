@@ -260,7 +260,7 @@ echo "————————————————————————�
 echo -e $green'  6. '$Font'查看配置信息'
 echo -e $green'  7. '$Font'查看进程信息'
 echo -e $green'  8. '$Font'修改端口'
-frps_pid
+[[ -d /etc/frps ]] && frps_pid
 
 
 read -p "输入序号: " x
