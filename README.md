@@ -13,5 +13,5 @@ wget -O vnstat.sh https://github.com/sp-aila/shell/raw/main/vnstat.sh && chmod +
 ````
 ### 安装cloudreve网盘
 ````shell
-wget -O cloudreve.sh https://github.com/sp-aila/shell/raw/main/cloudreve.sh && chmod +x cloudreve.sh && bashn cloudreve.sh
+wget -O cloudreve.sh https://github.com/sp-aila/shell/raw/main/cloudreve.sh && chmod +x cloudreve.sh && bash cloudreve.sh
 ````
