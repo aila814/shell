@@ -30,6 +30,7 @@ if [[ "$local_version" == "$version" ]]; then
     _echo "版本一致,无需更新" 1
     exit
     else
+    _echo "停止frps" 1 && stop
     _echo "开始更新..." 1
     wget -q "${download_url}" -O /etc/frps/frps.tar.gz
     tar zxf /etc/frps/frps.tar.gz -C /etc/frps > /dev/null
@@ -37,6 +38,7 @@ if [[ "$local_version" == "$version" ]]; then
     chmod +x /etc/frps/frps
     rm -rf /etc/frps/frp_* /etc/frps/frps.tar.gz
     _echo "更新完成" 1
+    _echo "启动frps" 1 && start
 fi
 
 }
@@ -112,8 +114,7 @@ uninstall(){
 	systemctl stop frps
 	systemctl disable frps
 	rm -rf /etc/frps
-	# rm -rf /etc/systemd/system/frps.service
-	rm -rf $(systemctl status cloudreve | grep "Loaded:" | sed 's/;.*$//g;s/^.*(//g')
+	rm -rf /etc/systemd/system/frps.service
     _echo "卸载完成!" 1	
 }
 
@@ -304,6 +305,7 @@ frp_edit
 [[ "$1" == "status" ]] && frps_pid && exit
 [[ "$1" == "update" ]] && update && exit
 home(){
+echo -e '  0. 更新'
 echo -e '  1. 安装'
 echo -e '  2. 卸载'
 if [[ -f "/etc/frps/frps" ]]; then
@@ -315,11 +317,20 @@ echo "————————————————————————�
 echo -e '  6. 查看配置信息'
 echo -e '  7. 查看进程信息'
 echo -e '  8. 修改端口'
+echo -e '  9. 查看日志'
 echo -e ' 10. 清空日志'
 frps_pid
 fi
 
 read -p "输入序号: " x
+if [[ "$x" == "0" ]]; then
+	if [[ ! -d /etc/frps ]]; then
+		_echo "未安装" 0
+		exit
+	else
+		update
+	fi
+fi
 if [[ "$x" == "1" ]]; then
 	install
 fi
@@ -373,10 +384,8 @@ if [[ "$x" == "8" ]]; then
 fi
 if [[ "$x" == "9" ]]; then
 	
-	if [[ ! -d /etc/frps ]]; then
-		_echo "未安装" 0
-	else
-		Detection_port
+	if [[ -f "/etc/frps/frps.log" ]]; then
+        cat /etc/frps/frps.log 
 	fi
 fi
 if [[ "$x" == "10" ]]; then
@@ -388,7 +397,6 @@ if [[ "$x" == "10" ]]; then
 fi
 }
 home
-
 
 
 
