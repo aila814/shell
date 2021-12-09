@@ -11,3 +11,7 @@ wget -O frpc.sh https://github.com/sp-aila/shell/raw/main/frpc.sh && chmod +x fr
 ````shell
 wget -O vnstat.sh https://github.com/sp-aila/shell/raw/main/vnstat.sh && chmod +x vnstat.sh && bash vnstat.sh 
 ````
+### 安装cloudreve网盘
+````shell
+wget -O cloudreve.sh https://github.com/sp-aila/shell/raw/main/cloudreve.sh && chmod +x cloudreve.sh && bashn cloudreve.sh
+````
