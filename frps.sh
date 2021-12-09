@@ -308,7 +308,7 @@ home(){
 echo -e '  0. 更新'
 echo -e '  1. 安装'
 echo -e '  2. 卸载'
-if [[ -f "/etc/frps/frps" ]]; then
+if [[ -d "/etc/frps" ]]; then
 echo "———————————————————————————"
 echo -e '  3. 启动'
 echo -e '  4. 停止'
