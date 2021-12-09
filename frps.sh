@@ -17,6 +17,30 @@ if [[ $2 == 00 ]]; then
     echo -e "$red$1$Font"
 fi
 }
+# 更新
+update(){
+version_info=$(curl -s https://api.github.com/repos/fatedier/frp/releases/latest)
+version=$(grep "tag_name" <<< "$version_info" | sed 's/tag_name//g;s/"//g;s/ //g;s/://g;s/,//g;s/v//g')
+download_url=$(grep "browser_download_url" <<< "$version_info" | sed 's/browser_download_url//g;s/"//g;s/ //g;s/://g;s/,//g;s/\/\//:\/\//g' | grep "linux_amd64")
+[[ -z "$version" ]] && _echo "获取版本失败" 0 && exit
+local_version=$(/etc/frps/frps -v)
+_echo "本地版本: $local_version" 1
+_echo "最新版本: $version" 1
+if [[ "$local_version" == "$version" ]]; then
+    _echo "版本一致,无需更新" 1
+    exit
+    else
+    _echo "开始更新..." 1
+    wget -q "${download_url}" -O /etc/frps/frps.tar.gz
+    tar zxf /etc/frps/frps.tar.gz -C /etc/frps > /dev/null
+    mv /etc/frps/frp_*/frps /etc/frps
+    chmod +x /etc/frps/frps
+    rm -rf /etc/frps/frp_* /etc/frps/frps.tar.gz
+    _echo "更新完成" 1
+fi
+
+}
+# 安装
 install(){
 version_info=$(curl -s https://api.github.com/repos/fatedier/frp/releases/latest)
 version=$(grep "tag_name" <<< "$version_info" | sed 's/tag_name//g;s/"//g;s/ //g;s/://g;s/,//g')
@@ -27,7 +51,7 @@ if [[ -z "$version" ]]; then
     else
     [[ ! -d "/etc/frps" ]] && mkdir "/etc/frps"
     rm -rf /etc/frps/*
-    echo -e "最新版本:\n$version"
+    _echo "最新版本: $version" 1
     _echo "开始下载..." 1
     wget -q "${download_url}" -O /etc/frps/frps.tar.gz
     tar zxvf /etc/frps/frps.tar.gz -C /etc/frps > /dev/null
@@ -36,9 +60,9 @@ if [[ -z "$version" ]]; then
     rm -rf /etc/frps/frp_* /etc/frps/frps.tar.gz
     read -p "连接端口(默认7000): " port && [[ -z $port ]] && port="7000"
     read -p "KCP端口(默认7001): " kcp_port && [[ -z $kcp_port ]] && kcp_port="7001"
-    read -p "UDP端口(默认7002): " udp_port && [[ -z $udp_port ]] && udp_port="7001"
+    read -p "UDP端口(默认7002): " udp_port && [[ -z $udp_port ]] && udp_port="7002"
     read -p "HTTP端口(默认80): " http_port && [[ -z $http_port ]] && http_port="80"
-    read -p "HTTPS端口(默认80): " https_port && [[ -z $https_port ]] && https_port="443"
+    read -p "HTTPS端口(默认443): " https_port && [[ -z $https_port ]] && https_port="443"
     read -p "token,连接密码(默认123456): " token && [[ -z $token ]] && token="123456"
 [[ ! -f "/etc/frps/frps.ini" ]] && 	echo -e "[common]
 # 连接端口
@@ -53,17 +77,19 @@ vhost_http_port=$http_port
 vhost_https_port=$https_port
 # 连接密码
 token=$token
+# 日志文件位置
+log_file=/etc/frps/frps.log
 # web面板端口
-# dashboard_port=7500
+dashboard_port=7500
 # web面板账号
-# dashboard_user=admin
+dashboard_user=admin
 # web面板密码
-# dashboard_pwd=admin
+dashboard_pwd=admin
 # 用于二级域名访问 泛解析到服务器ip
 # subdomain_host=baidu.com
 # 自定义错误页面
 # custom_404_page=./404.html" > /etc/frps/frps.ini
-echo -e "[Unit]
+[[ ! -f "/lib/systemd/system/frps.service" ]] && 	echo -e "[Unit]
 Description=frps
 After=network.target
 [Service]
@@ -76,6 +102,8 @@ WantedBy=multi-user.target" > /lib/systemd/system/frps.service
 systemctl daemon-reload
 systemctl enable frps
 _echo "安装完成!" 1
+_echo "启动frps..." 1
+start
 fi
 }
 
@@ -191,13 +219,13 @@ echo "————————————————————————�
 }
 # 修改配置信息
 frp_edit(){
-echo -e $green'  1. '$Font'修改连接端口'
-echo -e $green'  2. '$Font'修改HTTP端口'
-echo -e $green'  3. '$Font'修改HTTPS端口'
-echo -e $green'  4. '$Font'修改TOKEN'
-echo -e $green'  5. '$Font'修改KCP端口'
-echo -e $green'  6. '$Font'修改UDP端口'
-echo -e $green'  0. '$Font'退出'
+echo -e '  1. 修改连接端口'
+echo -e '  2. 修改HTTP端口'
+echo -e '  3. 修改HTTPS端口'
+echo -e '  4. 修改TOKEN'
+echo -e '  5. 修改KCP端口'
+echo -e '  6. 修改UDP端口'
+echo -e '  0. 退出'
 read -p "输入序号: " x
 if [[ "$x" == "0" ]]; then
     exit
@@ -269,20 +297,26 @@ fi
 frp_edit
 }
 
-
+[[ "$1" == "start" ]] && start && exit
+[[ "$1" == "stop" ]] && stop && exit
+[[ "$1" == "restart" ]] && restart && exit
+[[ "$1" == "status" ]] && frps_pid && exit
+[[ "$1" == "update" ]] && update && exit
 home(){
-echo -e $green'  1. '$Font'安装'
-echo -e $green'  2. '$Font'卸载'
+echo -e '  1. 安装'
+echo -e '  2. 卸载'
+if [[ -f "/etc/frps/frps" ]]; then
 echo "———————————————————————————"
-echo -e $green'  3. '$Font'启动'
-echo -e $green'  4. '$Font'停止'
-echo -e $green'  5. '$Font'重启'
+echo -e '  3. 启动'
+echo -e '  4. 停止'
+echo -e '  5. 重启'
 echo "———————————————————————————"
-echo -e $green'  6. '$Font'查看配置信息'
-echo -e $green'  7. '$Font'查看进程信息'
-echo -e $green'  8. '$Font'修改端口'
+echo -e '  6. 查看配置信息'
+echo -e '  7. 查看进程信息'
+echo -e '  8. 修改端口'
+echo -e ' 10. 清空日志'
 frps_pid
-
+fi
 
 read -p "输入序号: " x
 if [[ "$x" == "1" ]]; then
@@ -293,7 +327,7 @@ if [[ "$x" == "2" ]]; then
 fi
 if [[ "$x" == "3" ]]; then
 	if [[ ! -d /etc/frps ]]; then
-		echo -e "$red[INFO]$Font 未安装"
+		_echo "未安装" 0
 	else
 		Detection_port
 	fi
@@ -301,21 +335,21 @@ if [[ "$x" == "3" ]]; then
 fi
 if [[ "$x" == "4" ]]; then
 	if [[ ! -d /etc/frps ]]; then
-		echo -e "$red[INFO]$Font 未安装"
+		_echo "未安装" 0
 	else
 		stop
 	fi
 fi
 if [[ "$x" == "5" ]]; then
 	if [[ ! -d /etc/frps ]]; then
-		echo -e "$red[INFO]$Font 未安装"
+		_echo "未安装" 0
 	else
 		restart
 	fi
 fi
 if [[ "$x" == "6" ]]; then
 	if [[ ! -d /etc/frps ]]; then
-		echo -e "$red[INFO]$Font 未安装"
+		_echo "未安装" 0
 	else
 		frps_1
 	fi
@@ -323,21 +357,33 @@ if [[ "$x" == "6" ]]; then
 fi
 if [[ "$x" == "7" ]]; then
 	if [[ ! -d /etc/frps ]]; then
-		echo -e "$red[INFO]$Font 未安装"
+		_echo "未安装" 0
 	else
 		systemctl status frps
 	fi
 fi
 if [[ "$x" == "8" ]]; then
 	if [[ ! -d /etc/frps ]]; then
-		echo -e "$red[INFO]$Font 未安装"
+		_echo "未安装" 0
 	else
 		frp_edit
 	fi
 	
 fi
 if [[ "$x" == "9" ]]; then
-	Detection_port
+	
+	if [[ ! -d /etc/frps ]]; then
+		_echo "未安装" 0
+	else
+		Detection_port
+	fi
+fi
+if [[ "$x" == "10" ]]; then
+	
+	if [[ -f "/etc/frps/frps.log" ]]; then
+		> "/etc/frps/frps.log"
+		_echo "已清空" 1
+	fi
 fi
 }
 home
