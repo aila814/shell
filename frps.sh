@@ -114,8 +114,7 @@ uninstall(){
 	systemctl stop frps
 	systemctl disable frps
 	rm -rf /etc/frps
-	# rm -rf /etc/systemd/system/frps.service
-	rm -rf $(systemctl status frps | grep "Loaded:" | sed 's/;.*$//g;s/^.*(//g')
+	rm -rf /lib/systemd/system/frps.service
     _echo "卸载完成!" 1	
 }
 
