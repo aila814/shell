@@ -11,7 +11,7 @@ sed -i '/^SaveInterval/s/.*/SaveInterval 1/g' /etc/vnstat/etc/vnstat.conf
 ln -s /etc/vnstat/bin/vnstat /usr/bin/vnstat
 ln -s /etc/vnstat/bin/vnstati /usr/bin/vnstati
 ln -s /etc/vnstat/sbin/vnstatd /usr/bin/vnstatd
-chmod -R 777 /var/lib/vnstat
+
 echo "[Unit]
 Description=vnstat守护程序
 After=network.target
@@ -28,5 +28,4 @@ WantedBy=multi-user.target" > /usr/lib/systemd/system/vnstat.service
 systemctl daemon-reload
 systemctl start vnstat
 systemctl enable vnstat
-
- 
+chmod -R 777 /var/lib/vnstat
