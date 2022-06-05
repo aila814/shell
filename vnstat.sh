@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# https://humdi.net/vnstat/
 yum install -q -y gcc gcc-c++ make sqlite-devel || apt install -y build-essential sqlite3 libsqlite3-dev
 wget https://humdi.net/vnstat/vnstat-2.7.tar.gz
 tar zxvf vnstat-2.7.tar.gz
