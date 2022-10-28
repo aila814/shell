@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# curl -s https://api.github.com/repos/fatedier/frp/releases/latest | jq -r  .tag_name
+# curl -s https://api.github.com/repos/fatedier/frp/releases/latest | jq -r  .assets[].browser_download_url
 
 _echo(){
 green="\033[32m\033[01m"
