@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# curl -s https://api.github.com/repos/fatedier/frp/releases/latest | jq -r  .tag_name
+# curl -s https://api.github.com/repos/fatedier/frp/releases/latest | jq -r  .tag_name| sed s/[a-zA-Z]//g
 # curl -s https://api.github.com/repos/fatedier/frp/releases/latest | jq -r  .assets[].browser_download_url
 
 _echo(){
@@ -19,6 +19,20 @@ if [[ $2 == 00 ]]; then
     echo -e "$red$1$Font"
 fi
 }
+
+# 安装依赖
+if [[ -z  $(command -v jq) ]]; then
+    if [[ $(cat /etc/os-release | grep -w ID | sed 's/ID=//' | sed 's/\"//g') == "centos" ]]; then
+	    yum install jq -y
+		else   
+		apt update -y
+		apt install jq -y
+    fi
+fi
+
+
+
+
 # 更新
 update(){
 version_info=$(curl -s https://api.github.com/repos/fatedier/frp/releases/latest)
