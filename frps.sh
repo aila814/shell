@@ -179,15 +179,15 @@ http=$(awk -F'=' '/vhost_http_port/{print $2}' /etc/frps/frps.ini)
 https=$(awk -F'=' '/vhost_https_port/{print $2}' /etc/frps/frps.ini)
 port=$(awk -F'=' '/^bind_port/{print $2}' /etc/frps/frps.ini)
 token=$(awk -F'=' '/token/{print $2}' /etc/frps/frps.ini)
-if [[ -n $(netstat -ntulp |grep $kcp_port) ]]; then
+if [[ -n $(netstat -ntulp |grep :$kcp_port) ]]; then
 	_echo "KCP端口已使用" 0
-elif [[ -n $(netstat -ntulp |grep $udp_port) ]]; then
+elif [[ -n $(netstat -ntulp |grep :$udp_port) ]]; then
 	_echo "UDP端口已使用" 0
-elif [[ -n $(netstat -ntulp |grep $http) ]]; then
+elif [[ -n $(netstat -ntulp |grep :$http) ]]; then
 	_echo "HTTP端口已使用" 0
-elif [[ -n $(netstat -ntulp |grep $https) ]]; then
+elif [[ -n $(netstat -ntulp |grep :$https) ]]; then
 	_echo "HTTPS端口已使用" 0
-elif [[ -n $(netstat -ntulp |grep $port) ]]; then
+elif [[ -n $(netstat -ntulp |grep :$port) ]]; then
 	_echo "连接端口已使用" 0
 else
     start
@@ -236,7 +236,7 @@ if [[ "$x" == "0" ]]; then
 fi
 if [[ "$x" == "1" ]]; then
 	read -p "连接端口: " tmp
-	if [[ -n $(netstat -ntulp |grep $tmp) ]]; then
+	if [[ -n $(netstat -ntulp |grep :$tmp) ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
 	    else
@@ -248,7 +248,7 @@ if [[ "$x" == "1" ]]; then
 fi
 if [[ "$x" == "2" ]]; then
 	read -p "HTTP端口: " tmp
-	if [[ -n $(netstat -ntulp |grep $tmp) ]]; then
+	if [[ -n $(netstat -ntulp |grep :$tmp) ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
 	    else
@@ -259,7 +259,7 @@ if [[ "$x" == "2" ]]; then
 fi
 if [[ "$x" == "3" ]]; then
 	read -p "HTTPS端口: " tmp
-	if [[ -n $(netstat -ntulp |grep $tmp) ]]; then
+	if [[ -n $(netstat -ntulp |grep :$tmp) ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
 	    else
@@ -278,7 +278,7 @@ if [[ "$x" == "4" ]]; then
 fi
 if [[ "$x" == "5" ]]; then
 	read -p "KCP端口: " tmp
-	if [[ -n $(netstat -ntulp |grep $tmp) ]]; then
+	if [[ -n $(netstat -ntulp |grep :$tmp) ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
 	    else
@@ -289,7 +289,7 @@ if [[ "$x" == "5" ]]; then
 fi
 if [[ "$x" == "6" ]]; then
 	read -p "UDP端口: " tmp
-	if [[ -n $(netstat -ntulp |grep $tmp) ]]; then
+	if [[ -n $(netstat -ntulp |grep :$tmp) ]]; then
 	    echo -e "$red[INFO]$Font 端口已使用"
 	    frp_edit
 	    else
